@@ -10,20 +10,25 @@ create table checkout.product (
   width integer,
   height integer,
   length integer,
-  weight numeric
+  weight numeric,
+  currency text
 )
 
 insert into checkout.product (
-  product_id, description, price, width, height, length, weight
-) values (1, 'A', 1000, 50, 30, 10, 3)
+  product_id, description, price, width, height, length, weight, currency
+) values (1, 'A', 1000, 50, 30, 10, 3, 'BRL')
 insert into checkout.product (
-  product_id, description, price, width, height, length, weight
-) values (2, 'B', 5000, 50, 50, 50, 22)
+  product_id, description, price, width, height, length, weight, currency
+) values (2, 'B', 5000, 50, 50, 50, 22, 'BRL')
 insert into checkout.product (
-  product_id, description, price, width, height, length, weight
-) values (3, 'C', 30, 10, 10, 10, 0.9)+insert into checkout.product (
-  product_id, description, price, width, height, length, weight
-) values (3, 'D', 30, -10, 10, 10, 0.9)
+  product_id, description, price, width, height, length, weight, currency
+) values (3, 'C', 30, 10, 10, 10, 0.9, 'BRL')
+insert into checkout.product (
+  product_id, description, price, width, height, length, weight, currency
+) values (4, 'D', 30, -10, 10, 10, 0., 'BRL')
+insert into checkout.product (
+  product_id, description, price, width, height, length, weight, currency
+) values (5, 'A', 1000, 50, 30, 10, 3, 'USD')
 
 create table checkout.coupon (
   code text,

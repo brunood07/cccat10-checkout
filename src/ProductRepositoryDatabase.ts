@@ -1,6 +1,7 @@
 import pgp from "pg-promise";
+import ProductsRepository from "./ProductsRepository";
 
-export default class ProductRepositoryDatabase {
+export default class ProductRepositoryDatabase implements ProductsRepository {
   async getProduct(product_id: number): Promise<any> {
     const connection = pgp()(
       "postgres://docker:checkout@localhost:5432/checkout"
