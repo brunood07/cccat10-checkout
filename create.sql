@@ -1,5 +1,7 @@
 drop table checkout.coupon
 drop table checkout.product
+drop table checkout.order
+drop table checkout.item
 drop schema checkout
 create schema checkout
 
@@ -37,3 +39,17 @@ create table checkout.coupon (
 
 insert into checkout.coupon ('VALE20', 20, '2023-10-01T10:00:00')
 insert into checkout.coupon ('VALE10', 10, '2022-10-01T10:00:00')
+
+create table checkout.order (
+  id_order text,
+  cpf text,
+  total numeric,
+  freight numeric
+)
+
+create table checkout.item (
+  id_order text,
+  id_product integer,
+  price numeric,
+  quantity integer
+)
