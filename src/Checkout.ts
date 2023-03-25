@@ -30,10 +30,6 @@ export default class Checkout {
       sequence,
       new Date()
     );
-
-    // const output: Output = {
-    //   total: 0,
-    // };
     let freight = 0;
     if (input.items) {
       for (const item of input.items) {
