@@ -14,17 +14,11 @@ export default class SimulateFreight {
     };
     if (input.items) {
       for (const item of input.items) {
-        const productData = await this.productsRepository.getProduct(
+        const product = await this.productsRepository.getProduct(
           item.product_id
         );
-        const volume =
-          ((((productData.width / 100) * productData.height) / 100) *
-            productData.length) /
-          100;
-        const density = parseFloat(productData.weight) / volume;
-        const itemFreight = 1000 * volume * (density / 100);
+        const itemFreight = FreightCalculator.calculate(product);
         output.freight += Math.max(itemFreight, 10) * item.quantity;
-        item.price = parseFloat(productData.price);
       }
     }
     return output;

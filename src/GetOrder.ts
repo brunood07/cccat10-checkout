@@ -7,15 +7,12 @@ export default class GetOrder {
   ) {}
 
   async execute(id: string): Promise<Output> {
+    const order = await this.orderRepository.getById(id);
     const output: Output = {
-      total: 0,
-      freight: 0,
-      code: "",
+      total: order.getTotal(),
+      freight: order.freight,
+      code: order.getCode(),
     };
-    const orderData = await this.orderRepository.getById(id);
-    output.total = parseFloat(orderData.total);
-    output.freight = parseFloat(orderData.freight);
-    output.code = orderData.code;
     return output;
   }
 }

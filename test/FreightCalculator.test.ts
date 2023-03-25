@@ -1,16 +1,8 @@
 import FreightCalculator from "../src/FreightCalculator";
+import Product from "../src/Product";
 
 test("Deve calcular o frete do produto", function () {
-  const product = {
-    product_id: 6,
-    description: "A",
-    price: 1000,
-    width: 100,
-    height: 30,
-    length: 10,
-    weight: 3,
-    currency: "USD",
-  };
+  const product = new Product(6, "A", 1000, 100, 30, 10, 3, "USD");
   const freight = FreightCalculator.calculate(product);
   expect(freight).toBe(30);
 });
