@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import Coupon from "./Coupon";
 import Cpf from "./Cpf";
 import CurrencyTable from "./CurrencyTable";
 import Item from "./Item";
@@ -8,6 +9,7 @@ export default class Order {
   readonly items: Item[];
   readonly cpf: Cpf;
   readonly code: string;
+  coupon?: Coupon;
   freight = 0;
 
   constructor(
@@ -40,8 +42,15 @@ export default class Order {
         item.quantity *
         this.currencyTable.getCurrency(item.currency);
     }
+    if (this.coupon) {
+      total -= this.coupon.calculateDiscount(total);
+    }
     total += this.freight;
     return total;
+  }
+
+  addCoupon(coupon: Coupon) {
+    if (!coupon.isExpired(this.date)) this.coupon = coupon;
   }
 
   getCode() {

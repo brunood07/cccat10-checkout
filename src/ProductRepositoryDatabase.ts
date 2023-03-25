@@ -1,5 +1,5 @@
 import pgp from "pg-promise";
-import Product from "./Product";
+import Product from "./domain/entity/Product";
 import ProductsRepository from "./ProductsRepository";
 
 export default class ProductRepositoryDatabase implements ProductsRepository {

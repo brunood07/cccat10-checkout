@@ -1,14 +1,14 @@
-import CouponRepository from "./CouponRepository";
-import CouponRepositoryDatabase from "./CouponRepositoryDatabase";
-import CurrencyGateway from "./CurrencyGateway";
-import CurrencyGatewayHttp from "./CurrencyGatewayHttp";
-import CurrencyTable from "./CurrencyTable";
-import FreightCalculator from "./FreightCalculator";
-import Order from "./Order";
-import OrderRepository from "./OrderRepository";
-import OrderRepositoryDatabase from "./OrderRepositoryDatabase";
-import ProductRepositoryDatabase from "./ProductRepositoryDatabase";
-import ProductsRepository from "./ProductsRepository";
+import CouponRepository from "../../CouponRepository";
+import CouponRepositoryDatabase from "../../CouponRepositoryDatabase";
+import CurrencyGateway from "../../CurrencyGateway";
+import CurrencyGatewayHttp from "../../CurrencyGatewayHttp";
+import CurrencyTable from "../../domain/entity/CurrencyTable";
+import FreightCalculator from "../../domain/entity/FreightCalculator";
+import Order from "../../domain/entity/Order";
+import OrderRepository from "../../OrderRepository";
+import OrderRepositoryDatabase from "../../OrderRepositoryDatabase";
+import ProductRepositoryDatabase from "../../ProductRepositoryDatabase";
+import ProductsRepository from "../../ProductsRepository";
 
 export default class Checkout {
   constructor(
@@ -37,7 +37,6 @@ export default class Checkout {
           item.product_id
         );
         order.addItem(product, item.quantity);
-
         const itemFreight = FreightCalculator.calculate(product);
         freight += Math.max(itemFreight, 10) * item.quantity;
       }
@@ -45,15 +44,11 @@ export default class Checkout {
     if (input.from && input.to) {
       order.freight += freight;
     }
-    let total = order.getTotal();
     if (input.coupon) {
-      // coupon
       const coupon = await this.couponRepository.getCoupon(input.coupon);
-      if (!coupon.isExpired(order.date)) {
-        const percentage = coupon.percentage;
-        total -= (total * percentage) / 100;
-      }
+      order.addCoupon(coupon);
     }
+    let total = order.getTotal();
     await this.orderRepository.save(order);
     return {
       total,

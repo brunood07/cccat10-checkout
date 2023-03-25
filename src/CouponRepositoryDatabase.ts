@@ -1,5 +1,5 @@
 import pgp from "pg-promise";
-import Coupon from "./Coupon";
+import Coupon from "./domain/entity/Coupon";
 import CouponRepository from "./CouponRepository";
 
 export default class CouponRepositoryDatabase implements CouponRepository {

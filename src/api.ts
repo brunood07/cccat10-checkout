@@ -1,7 +1,5 @@
 import express, { Request, Response } from "express";
-import pgp from "pg-promise";
-import Checkout from "./Checkout";
-import { validate } from "./validator";
+import Checkout from "./application/usecase/Checkout";
 
 const app = express();
 app.use(express.json());

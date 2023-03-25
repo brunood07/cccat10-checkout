@@ -1,5 +1,5 @@
-import OrderRepository from "./OrderRepository";
-import OrderRepositoryDatabase from "./OrderRepositoryDatabase";
+import OrderRepository from "../../OrderRepository";
+import OrderRepositoryDatabase from "../../OrderRepositoryDatabase";
 
 export default class GetOrder {
   constructor(

@@ -1,4 +1,4 @@
-import SimulateFreight from "../src/SimulateFreight";
+import SimulateFreight from "../src/application/usecase/SimulateFreight";
 
 let simulateFreight: SimulateFreight;
 
