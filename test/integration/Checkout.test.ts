@@ -1,21 +1,45 @@
 import Sinon from "sinon";
 import crypto from "node:crypto";
-import Checkout from "../src/application/usecase/Checkout";
-import CouponRepositoryDatabase from "../src/CouponRepositoryDatabase";
-import CurrencyGateway from "../src/CurrencyGateway";
-import CurrencyGatewayHttp from "../src/CurrencyGatewayHttp";
-import ProductRepositoryDatabase from "../src/ProductRepositoryDatabase";
-import ProductsRepository from "../src/ProductsRepository";
-import GetOrder from "../src/application/usecase/GetOrder";
-import OrderRepositoryDatabase from "../src/OrderRepositoryDatabase";
-import Product from "../src/domain/entity/Product";
+import Checkout from "../../src/application/usecase/Checkout";
+import CouponRepositoryDatabase from "../../src/infra/repository/CouponRepositoryDatabase";
+import CurrencyGateway from "../../src/application/gateway/CurrencyGateway";
+import CurrencyGatewayHttp from "../../src/infra/gateway/CurrencyGatewayHttp";
+import ProductRepositoryDatabase from "../../src/infra/repository/ProductRepositoryDatabase";
+import ProductsRepository from "../../src/application/repository/ProductsRepository";
+import GetOrder from "../../src/application/usecase/GetOrder";
+import OrderRepositoryDatabase from "../../src/infra/repository/OrderRepositoryDatabase";
+import Product from "../../src/domain/entity/Product";
+import PgPromiseAdapter from "../../src/infra/database/PgPromiseAdapter";
+import Connection from "../../src/infra/database/Connection";
+import CouponRepository from "../../src/application/repository/CouponRepository";
+import OrderRepository from "../../src/application/repository/OrderRepository";
+import AxiosAdapter from "../../src/infra/http/AxiosAdapter";
 
 let checkout: Checkout;
 let getOrder: GetOrder;
+let connection: Connection;
+let productsRepository: ProductsRepository;
+let couponRepository: CouponRepository;
+let orderRepository: OrderRepository;
 
 beforeEach(function () {
-  checkout = new Checkout();
-  getOrder = new GetOrder();
+  connection = new PgPromiseAdapter();
+  const httpClient = new AxiosAdapter();
+  const currencyGateway = new CurrencyGatewayHttp(httpClient);
+  productsRepository = new ProductRepositoryDatabase(connection);
+  couponRepository = new CouponRepositoryDatabase(connection);
+  orderRepository = new OrderRepositoryDatabase(connection);
+  checkout = new Checkout(
+    currencyGateway,
+    productsRepository,
+    couponRepository,
+    orderRepository
+  );
+  getOrder = new GetOrder(orderRepository);
+});
+
+afterEach(async function () {
+  await connection.close();
 });
 
 test("Não deve aceitar um pedido com cpf inválido", async function () {
@@ -23,7 +47,7 @@ test("Não deve aceitar um pedido com cpf inválido", async function () {
     cpf: "406.302.170-27",
     items: [],
   };
-  expect(() => checkout.execute(input)).rejects.toThrow(
+  await expect(() => checkout.execute(input)).rejects.toThrow(
     new Error("Invalid cpf")
   );
 });
@@ -86,7 +110,7 @@ test("Não deve criar um pedido com quantidade negativa", async function () {
     cpf: "407.302.170-27",
     items: [{ product_id: 1, quantity: -1 }],
   };
-  expect(() => checkout.execute(input)).rejects.toThrow(
+  await expect(() => checkout.execute(input)).rejects.toThrow(
     new Error("Invalid quantity")
   );
 });
@@ -99,7 +123,7 @@ test("Não deve criar um pedido com item duplicado", async function () {
       { product_id: 1, quantity: 1 },
     ],
   };
-  expect(() => checkout.execute(input)).rejects.toThrow(
+  await expect(() => checkout.execute(input)).rejects.toThrow(
     new Error("Duplicated Item")
   );
 });
@@ -121,7 +145,7 @@ test("Não deve criar um pedido se o produto tiver alguma dimensão negativa", a
     cpf: "407.302.170-27",
     items: [{ product_id: 4, quantity: 1 }],
   };
-  expect(() => checkout.execute(input)).rejects.toThrow(
+  await expect(() => checkout.execute(input)).rejects.toThrow(
     new Error("Invalid dimension")
   );
 });
@@ -216,7 +240,12 @@ test("Deve criar um pedido com 1 produto em dólar usando um fake", async functi
     },
   };
 
-  checkout = new Checkout(currencyGateway, productsRepository);
+  checkout = new Checkout(
+    currencyGateway,
+    productsRepository,
+    couponRepository,
+    orderRepository
+  );
 
   const input = {
     cpf: "407.302.170-27",

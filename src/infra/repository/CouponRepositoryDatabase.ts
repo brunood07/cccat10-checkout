@@ -1,17 +1,15 @@
-import pgp from "pg-promise";
-import Coupon from "./domain/entity/Coupon";
-import CouponRepository from "./CouponRepository";
+import Coupon from "../../domain/entity/Coupon";
+import CouponRepository from "../../application/repository/CouponRepository";
+import Connection from "../database/Connection";
 
 export default class CouponRepositoryDatabase implements CouponRepository {
+  constructor(readonly connection: Connection) {}
+
   async getCoupon(code: string): Promise<Coupon> {
-    const connection = pgp()(
-      "postgres://docker:checkout@localhost:5432/checkout"
-    );
-    const [couponData] = await connection.query(
+    const [couponData] = await this.connection.query(
       "select * from checkout.coupon where code = $1",
       [code]
     );
-    await connection.$pool.end();
     return new Coupon(
       couponData.code,
       parseFloat(couponData.percentage),

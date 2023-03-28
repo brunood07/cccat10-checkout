@@ -1,21 +1,17 @@
-import CouponRepository from "../../CouponRepository";
-import CouponRepositoryDatabase from "../../CouponRepositoryDatabase";
-import CurrencyGateway from "../../CurrencyGateway";
-import CurrencyGatewayHttp from "../../CurrencyGatewayHttp";
+import CouponRepository from "../repository/CouponRepository";
+import CurrencyGateway from "../gateway/CurrencyGateway";
 import CurrencyTable from "../../domain/entity/CurrencyTable";
 import FreightCalculator from "../../domain/entity/FreightCalculator";
 import Order from "../../domain/entity/Order";
-import OrderRepository from "../../OrderRepository";
-import OrderRepositoryDatabase from "../../OrderRepositoryDatabase";
-import ProductRepositoryDatabase from "../../ProductRepositoryDatabase";
-import ProductsRepository from "../../ProductsRepository";
+import OrderRepository from "../repository/OrderRepository";
+import ProductsRepository from "../repository/ProductsRepository";
 
 export default class Checkout {
   constructor(
-    readonly currencyGateway: CurrencyGateway = new CurrencyGatewayHttp(),
-    readonly productsRepository: ProductsRepository = new ProductRepositoryDatabase(),
-    readonly couponRepository: CouponRepository = new CouponRepositoryDatabase(),
-    readonly orderRepository: OrderRepository = new OrderRepositoryDatabase()
+    readonly currencyGateway: CurrencyGateway,
+    readonly productsRepository: ProductsRepository,
+    readonly couponRepository: CouponRepository,
+    readonly orderRepository: OrderRepository
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -37,8 +33,8 @@ export default class Checkout {
           item.product_id
         );
         order.addItem(product, item.quantity);
-        const itemFreight = FreightCalculator.calculate(product);
-        freight += Math.max(itemFreight, 10) * item.quantity;
+        const itemFreight = FreightCalculator.calculate(product, item.quantity);
+        freight += itemFreight;
       }
     }
     if (input.from && input.to) {
