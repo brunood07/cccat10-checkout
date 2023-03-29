@@ -129,3 +129,9 @@ test("Deve criar um pedido com 1 produto calculando o frete com valor mínimo", 
   expect(output.freight).toBe(10);
   expect(output.total).toBe(40);
 });
+
+test("Deve listar os produtos", async function () {
+  const response = await axios.get("http://localhost:3000/products");
+  const output = response.data;
+  expect(output).toHaveLength(3);
+});

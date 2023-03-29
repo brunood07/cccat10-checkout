@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/api.ts",
-    "dev:currency": "nodemon src/main_api_currency.ts",
+    "dev": "nodemon src/main_api.ts",
     "test": "jest"
   },
   "keywords": [],

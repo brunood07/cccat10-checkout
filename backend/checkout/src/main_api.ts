@@ -5,22 +5,24 @@ import CurrencyGatewayHttp from "./infra/gateway/CurrencyGatewayHttp";
 import ExpressAdapter from "./infra/http/ExpressAdapter";
 import HttpController from "./infra/http/HttpController";
 import OrderRepositoryDatabase from "./infra/repository/OrderRepositoryDatabase";
-import PgPromiseAdapter from "./infra/database/PgPromiseAdapter";
+import PgPromise from "./infra/database/PgPromiseAdapter";
 import ProductRepositoryDatabase from "./infra/repository/ProductRepositoryDatabase";
+import GetProducts from "./application/usecase/GetProducts";
 
-const connection = new PgPromiseAdapter();
+const connection = new PgPromise();
 const httpClient = new AxiosAdapter();
 const currencyGateway = new CurrencyGatewayHttp(httpClient);
-const productsRepository = new ProductRepositoryDatabase(connection);
+const productRepository = new ProductRepositoryDatabase(connection);
 const couponRepository = new CouponRepositoryDatabase(connection);
 const orderRepository = new OrderRepositoryDatabase(connection);
 const checkout = new Checkout(
   currencyGateway,
-  productsRepository,
+  productRepository,
   couponRepository,
   orderRepository
 );
+const getProducts = new GetProducts(productRepository);
 const httpServer = new ExpressAdapter();
-// const httpServer = new HapiAdapter();
-new HttpController(httpServer, checkout);
+// const httpServer = new HapiHttpServer();
+new HttpController(httpServer, checkout, getProducts);
 httpServer.listen(3000);
