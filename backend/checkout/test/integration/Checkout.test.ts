@@ -14,6 +14,7 @@ import Connection from "../../src/infra/database/Connection";
 import CouponRepository from "../../src/application/repository/CouponRepository";
 import OrderRepository from "../../src/application/repository/OrderRepository";
 import AxiosAdapter from "../../src/infra/http/AxiosAdapter";
+import CatalogGatewayHttp from "../../src/infra/gateway/CatalogGatewayHttp";
 
 let checkout: Checkout;
 let getOrder: GetOrder;
@@ -146,7 +147,7 @@ test("Não deve criar um pedido se o produto tiver alguma dimensão negativa", a
     items: [{ product_id: 4, quantity: 1 }],
   };
   await expect(() => checkout.execute(input)).rejects.toThrow(
-    new Error("Invalid dimension")
+    new Error("Request failed with status code 422")
   );
 });
 
@@ -185,10 +186,6 @@ test("Deve criar um pedido com 1 produto em dólar usando um stub", async functi
 });
 
 test("Deve criar um pedido com 3 produtos com cupom de desconto com um spy", async function () {
-  const spyProductRepository = Sinon.spy(
-    ProductRepositoryDatabase.prototype,
-    "getProduct"
-  );
   const spyCouponRepository = Sinon.spy(
     CouponRepositoryDatabase.prototype,
     "getCoupon"
@@ -206,9 +203,7 @@ test("Deve criar um pedido com 3 produtos com cupom de desconto com um spy", asy
   expect(output.total).toBe(4872);
   expect(spyCouponRepository.calledOnce).toBeTruthy();
   expect(spyCouponRepository.calledWith("VALE20")).toBeTruthy();
-  expect(spyProductRepository.calledThrice).toBeTruthy();
   spyCouponRepository.restore();
-  spyProductRepository.restore();
 });
 
 test("Deve criar um pedido com 1 produto em dólar usando um mock", async function () {
@@ -242,6 +237,10 @@ test("Deve criar um pedido com 1 produto em dólar usando um fake", async functi
       return [];
     },
   };
+  const catalogGatewayStub = Sinon.stub(
+    CatalogGatewayHttp.prototype,
+    "getProduct"
+  ).resolves(new Product(6, "A", 1000, 10, 10, 10, 10, "USD"));
 
   checkout = new Checkout(
     currencyGateway,
@@ -256,6 +255,7 @@ test("Deve criar um pedido com 1 produto em dólar usando um fake", async functi
   };
   const output = await checkout.execute(input);
   expect(output.total).toBe(3000);
+  catalogGatewayStub.restore();
 });
 
 test("Deve criar um pedido e verificar o código de série do pedido", async function () {

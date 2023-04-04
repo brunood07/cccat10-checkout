@@ -114,7 +114,7 @@ test("Não deve criar um pedido se o produto tiver alguma dimensão negativa", a
   const response = await axios.post("http://localhost:3000/checkout", input);
   const output = response.data;
   expect(response.status).toBe(422);
-  expect(output.message).toBe("Invalid dimension");
+  expect(output.message).toBe("Request failed with status code 422");
 });
 
 test("Deve criar um pedido com 1 produto calculando o frete com valor mínimo", async function () {

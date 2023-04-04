@@ -1,5 +1,15 @@
 import { createApp } from "vue";
 import "./style.css";
 import App from "./App.vue";
+import CheckoutGatewayHttp from "./gateways/CheckoutGatewayHttp";
+import FetchAdapter from "./infra/http/FetchAdapter";
 
-createApp(App).mount("#app");
+const app = createApp(App);
+// const httpClient = new AxiosAdapter();
+const httpClient = new FetchAdapter();
+const checkoutGateway = new CheckoutGatewayHttp(
+  httpClient,
+  "http://localhost:3000"
+);
+app.provide("checkoutGateway", checkoutGateway);
+app.mount("#app");
