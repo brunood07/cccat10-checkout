@@ -10,6 +10,8 @@ export type Input = {
     weight: number;
     quantity: number;
   }[];
+  from?: string;
+  to?: string;
 };
 
 type Output = {

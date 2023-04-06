@@ -38,12 +38,9 @@ export default class Checkout {
       sequence,
       new Date()
     );
-    const freightInput: FreightInput = { items: [] };
+    const freightInput: FreightInput = { items: [], from: input.from, to: input.to };
     if (input.items) {
       for (const item of input.items) {
-        // const product = await this.productsRepository.getProduct(
-        //   item.product_id
-        // );
         const product = await this.catalogGateway.getProduct(item.product_id);
         order.addItem(product, item.quantity);
         freightInput.items.push({
