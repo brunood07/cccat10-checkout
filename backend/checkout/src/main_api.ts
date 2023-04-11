@@ -8,6 +8,7 @@ import OrderRepositoryDatabase from "./infra/repository/OrderRepositoryDatabase"
 import PgPromise from "./infra/database/PgPromiseAdapter";
 import ProductRepositoryDatabase from "./infra/repository/ProductRepositoryDatabase";
 import GetProducts from "./application/usecase/GetProducts";
+import AuthDecorator from "./application/decorator/AuthDecorator";
 
 const connection = new PgPromise();
 const httpClient = new AxiosAdapter();
@@ -24,5 +25,5 @@ const checkout = new Checkout(
 const getProducts = new GetProducts(productRepository);
 const httpServer = new ExpressAdapter();
 // const httpServer = new HapiHttpServer();
-new HttpController(httpServer, checkout, getProducts);
+new HttpController(httpServer, new AuthDecorator(checkout), getProducts);
 httpServer.listen(3000);
