@@ -17,6 +17,8 @@ import AxiosAdapter from "../../src/infra/http/AxiosAdapter";
 import CatalogGatewayHttp from "../../src/infra/gateway/CatalogGatewayHttp";
 import AuthDecorator from "../../src/application/decorator/AuthDecorator";
 import LogDecorator from "../../src/application/decorator/LogDecorator";
+import Queue from "../../src/infra/queue/Queue";
+import RabbitMQAdapter from "../../src/infra/queue/RabbitMQAdapter";
 
 let checkout: Checkout;
 let getOrder: GetOrder;
@@ -24,11 +26,14 @@ let connection: Connection;
 let productsRepository: ProductsRepository;
 let couponRepository: CouponRepository;
 let orderRepository: OrderRepository;
+let queue: Queue;
 
-beforeEach(function () {
+beforeEach(async function () {
   connection = new PgPromiseAdapter();
   const httpClient = new AxiosAdapter();
   const currencyGateway = new CurrencyGatewayHttp(httpClient);
+  queue = new RabbitMQAdapter();
+  await queue.connect();
   productsRepository = new ProductRepositoryDatabase(connection);
   couponRepository = new CouponRepositoryDatabase(connection);
   orderRepository = new OrderRepositoryDatabase(connection);
@@ -36,7 +41,11 @@ beforeEach(function () {
     currencyGateway,
     productsRepository,
     couponRepository,
-    orderRepository
+    orderRepository,
+    // undefined,
+    // undefined,
+    // undefined,
+    // queue
   );
   getOrder = new GetOrder(orderRepository);
 });
